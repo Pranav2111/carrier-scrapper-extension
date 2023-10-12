@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
   copyButton.addEventListener("click", function () {
     textArea.focus();
     textArea.select();
-    // textArea.setSelectionRange(0, 99999);
     document.execCommand("copy");
   });
 
@@ -15,15 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
       textArea.value = JSON.stringify(result.textAreaValue);
     }
   });
-
-  // const TButton = document.getElementById("t-button");
-
-  // TButton.addEventListener("click", function () {
-  //   const trackingNoField = document.querySelector('.ng2-tag-input__text-input')
-  //   trackingNoField.value = 'CN00771500'
-  // });
-
-  
 
   extractButton.addEventListener("click", function () {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -40,70 +30,59 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Vessel Departure": "origin_departure",
                 "Vessel Arrival": "arrival",
               },
-              swire:{
-                "Unload From Vessel0": 'gate_in',
-                "Load Onto Vessel1": 'origin_departure',
-                "Unload From Vessel2": 'arrival',
-                "Load Onto Vessel3": 'gate_out'
-              }
+              swire: {
+                "Unload From Vessel0": "gate_in",
+                "Load Onto Vessel1": "origin_departure",
+                "Unload From Vessel2": "arrival",
+                "Load Onto Vessel3": "gate_out",
+              },
             };
 
-            const extractedHTML = document.getElementById(
-              "track-booking"
-            ).outerHTML;
+            const extractedHTML =
+              document.getElementById("track-booking").outerHTML;
 
-            async function runGPT(rawHTML) {
-              const data = await fetch(
-                "https://api.openai.com/v1/chat/completions",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization:
-                      "Bearer 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",
-                  },
-                  body: JSON.stringify({
-                    model: "gpt-4",
-                    messages: [
-                      {
-                        role: "system",
-                        content: "You are a helpful assistant.",
-                      },
-                      {
-                        role: "user",
-                        content: `${rawHTML}
-                        From above html create me a json of event mapped with dates and location.
-                        Format date in IST+05:30 format.
-                        
-                        The json should be an array of objects having keys  "event_type", "location" and "planned_date"
-                        
-                        location in should be a string.
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(extractedHTML, "text/html");
 
-                        Provide me a JSON, not code for generating it.`,
-                      },
-                    ],
-                  }),
-                }
-              );
-              const response = await data.json();
-              console.log("1 ===========+>", response);
-              const formattedData = response?.choices[0]?.message?.content
-                ?.split("[")?.[1]
-                .split("]")?.[0];
-              const realArr = JSON.parse(`[${formattedData}]`);
-              console.log("2 ===========+>", realArr);
+            const dateElements = doc.querySelectorAll(
+              ".Text-90.paragraph-regular-14"
+            );
 
-              realArr.forEach((singleEvent, index) => {
-                singleEvent.event_type =
-                  carrierEventMap.swire[`${singleEvent.event_type}${index}`];
-              });
+            const locationElements = doc.querySelectorAll(
+              ".Text-90.paragraph-regular-15"
+            );
 
-              return realArr;
+            const eventElements = doc.querySelectorAll(
+              ".paragraph-semibold-16.Text-90.same-span"
+            );
+
+            const events = [];
+
+            // Loop through the elements and create JSON objects
+            for (let i = 0; i < dateElements.length; i++) {
+              const event = {
+                event_type: eventElements[i].textContent,
+                location: locationElements[i].textContent,
+                planned_date: new Date(
+                  dateElements[i].textContent
+                ).toISOString(),
+              };
+              events.push(event);
             }
 
-            const data1 = await runGPT(extractedHTML);
-            chrome.storage.local.set({ textAreaValue: data1 });
-            return data1;
+            const resultJSON = JSON.stringify(events, null, 2);
+
+            const parse = JSON.parse(resultJSON);
+
+            parse.forEach((singleEvent, index) => {
+              singleEvent.event_type =
+                carrierEventMap.swire[`${singleEvent.event_type}${index}`];
+            });
+
+            console.log("resultJSON2", parse);
+
+            chrome.storage.local.set({ textAreaValue: parse });
+            return parse;
           },
         },
         (results) => {
