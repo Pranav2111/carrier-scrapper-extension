@@ -1,11 +1,76 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>HTML Extractor</title>
-  </head>
-  <body>
-    <button id="extractButton">Extract HTML</button>
-    <div id="result"></div>
-    <script src="index.js"></script>
-  </body>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="src/style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    .extension-wrapper {
+      width: 300px;
+      background-color: whitesmoke;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border: 2px solid #8CB1FE;
+      border-radius: 5px;
+    }
+
+    #input-text-area {
+      background-color: #101e2a;
+      color: #bd7700;
+      padding: 5px;
+      width: 230px;
+      min-height: 100px;
+    }
+
+    #extractButton {
+      all: unset;
+      background-color: #0054FF;
+      padding: 3px 10px;
+      color: white;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    #extractButton:hover {
+      background-color: #3e7dff;
+    }
+
+    .button-container {
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .button-container button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="extension-wrapper">
+    <div class="button-container">
+      <button id='extractButton'>Extract Data</button>
+      <button id='copy-button'>Copy</button>
+    </div>
+    <div class="extension-content">
+      <textarea id="input-text-area" placeholder="Click on extract to get data"></textarea>
+    </div>
+  </div>
+  <script src="index.js"></script>
+</body>
+
 </html>

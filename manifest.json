@@ -1,12 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "HTML Extractor",
+  "name": "Carrier Data Scrapper",
   "version": "1.0",
   "description": "Get HTML content of the active tab",
-  "permissions": [
-    "activeTab",
-    "scripting"
-  ],
+  "permissions": ["activeTab", "scripting", "storage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -25,5 +22,6 @@
       "matches": ["<all_urls>"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "host_permissions": ["https://api.openai.com/v1/chat/completions"]
 }
