@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   headers: {
                     "Content-Type": "application/json",
                     Authorization:
-                      "Bearer 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",
+                      "Add Token",
                   },
                   body: JSON.stringify({
                     model: "gpt-4",
